@@ -1,9 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-// Make sure this path matches your actual file structure
+const connectDB = require('./config/db');
 const webhookRoutes = require('./routes/webhook.routes');
+const apiRoutes = require('./routes/api.routes');
 
+connectDB();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -15,6 +17,7 @@ app.use(express.json({
 }));
 
 app.use('/api/webhooks', webhookRoutes);
+app.use('/api', apiRoutes);
 
 app.listen(PORT, () => {
   console.log(`Scanner Engine running on port ${PORT}`);

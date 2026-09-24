@@ -1,5 +1,7 @@
 const githubService = require('../services/github.service');
 const ScannerService = require('../engine/scanner.service');
+const Scan = require('../models/Scan');
+const slackService = require('../services/slack.service');
 
 exports.handleGithubPush = async (req, res) => {
   res.status(202).send("Webhook queued");
@@ -29,9 +31,47 @@ exports.handleGithubPush = async (req, res) => {
   if (detectedLeaks.length > 0) {
     console.log(`DANGER: Found ${detectedLeaks.length} secrets in push!`);
     console.table(detectedLeaks);
-    // TODO: Pass detectedLeaks to MongoDB to save
-    // TODO: Fire Slack Alert
+    for (const commit of validDiffs) {
+      const commitLeaks = detectedLeaks.filter(l => l.commitId === commit.commitId);
+      if (commitLeaks.length > 0) {
+        await Scan.create({
+          repository: `${owner}/${repo}`,
+          commitId: commit.commitId,
+          authorEmail: commit.author,
+          status: 'LEAK_DETECTED',
+          leaks: commitLeaks
+        });
+        await slackService.sendAlert(
+          `${owner}/${repo}`, 
+          commit.commitId, 
+          commit.author, 
+          commitLeaks
+        );
+        const markdownLeaks = commitLeaks.map(l => 
+          `- **${l.ruleName}** in \`${l.file}\` (Line ${l.lineNumber})\n  *Masked:* \`${l.maskedSecret}\``
+        ).join('\n\n');
+
+        const githubWarningMessage = `## 🚨 SECURITY ALERT: Hardcoded Secrets Detected\n\nGitScan identified ${commitLeaks.length} potential secret(s) in this commit. Please rotate them immediately to prevent unauthorized access.\n\n${markdownLeaks}\n\n> *Note: This is an automated security scan. Please do not reply to this bot.*`;
+
+        await githubService.createCommitComment(
+          owner, 
+          repo, 
+          commit.commitId, 
+          githubWarningMessage
+        );
+      }
+    }
+    console.log(`Scans successfully saved to MongoDB.`);
   } else {
     console.log(`Scan complete. No secrets found in push.`);
+    for (const commit of validDiffs) {
+      await Scan.create({
+        repository: `${owner}/${repo}`,
+        commitId: commit.commitId,
+        authorEmail: commit.author,
+        status: 'CLEAN',
+        leaks: []
+      });
+    }
   }
 };

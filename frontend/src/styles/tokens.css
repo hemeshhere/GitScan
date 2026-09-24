@@ -1,0 +1,127 @@
+/* ─── GitScan Design Tokens ─── */
+
+/* Dark theme (default) */
+:root {
+  /* Backgrounds */
+  --bg:            #0B0B0C;
+  --surface:       #111113;
+  --raised:        #17171A;
+  --border:        #26262B;
+  --border-subtle: #1D1D21;
+
+  /* Text */
+  --text-primary:   #EDEDEF;
+  --text-secondary: #A1A1AA;
+  --text-muted:     #71717A;
+
+  /* Accent — restrained signal green */
+  --accent:      #3ECF8E;
+  --accent-dim:  rgba(62, 207, 142, 0.12);
+  --accent-ring: rgba(62, 207, 142, 0.4);
+
+  /* Severity */
+  --critical:    #E5484D;
+  --high:        #F76B15;
+  --medium:      #F5B544;
+  --low:         #5B8DEF;
+
+  /* Severity backgrounds (very muted) */
+  --critical-bg: rgba(229, 72, 77,  0.1);
+  --high-bg:     rgba(247, 107, 21, 0.1);
+  --medium-bg:   rgba(245, 181, 68, 0.1);
+  --low-bg:      rgba(91,  141, 239, 0.1);
+
+  /* Scrollbar */
+  --scrollbar-track: var(--surface);
+  --scrollbar-thumb: var(--border);
+
+  color-scheme: dark;
+}
+
+/* Light theme */
+.light {
+  --bg:            #FAFAFA;
+  --surface:       #FFFFFF;
+  --raised:        #F4F4F5;
+  --border:        #E4E4E7;
+  --border-subtle: #F0F0F1;
+
+  --text-primary:   #09090B;
+  --text-secondary: #52525B;
+  --text-muted:     #A1A1AA;
+
+  --accent:      #1A9E6A;
+  --accent-dim:  rgba(26, 158, 106, 0.1);
+  --accent-ring: rgba(26, 158, 106, 0.35);
+
+  --critical:    #CE2C31;
+  --high:        #BD4B00;
+  --medium:      #B45309;
+  --low:         #2563EB;
+
+  --critical-bg: rgba(206, 44, 49,  0.08);
+  --high-bg:     rgba(189, 75, 0,   0.08);
+  --medium-bg:   rgba(180, 83, 9,   0.08);
+  --low-bg:      rgba(37, 99, 235,  0.08);
+
+  color-scheme: light;
+}
+
+/* ─── Base Reset ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  border-color: var(--border);
+}
+
+html {
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: "Geist", system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+/* Tabular numbers for data-dense contexts */
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border); }
+
+/* ─── Focus ring ─── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Selection ─── */
+::selection {
+  background: var(--accent-dim);
+  color: var(--text-primary);
+}
+
+/* ─── Code base ─── */
+code, kbd, pre, samp {
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
+}
